@@ -149,12 +149,27 @@
   <section id="admin" class="section">
     <div class="card">
       <h2>관리자 확인</h2>
-      <div class="adminPanel">
-        <p class="small">이 브라우저에서 접수된 진단 자료를 확인하고 CSV로 내려받을 수 있습니다. 온라인 운영 시에는 Firebase/Supabase/Google Sheets 연동을 권장합니다.</p>
+      <div id="adminLoginBox" class="adminPanel">
+        <p class="small">운영자만 접수자료를 확인할 수 있습니다. 관리자 비밀번호를 입력하면 이 브라우저의 관리자 화면이 열립니다.</p>
+        <div class="formGrid">
+          <div>
+            <label>관리자 비밀번호</label>
+            <input id="adminPassword" type="password" placeholder="운영자 전용 비밀번호">
+          </div>
+        </div>
+        <div class="btnRow">
+          <button class="btn secondary" onclick="checkAdmin()">관리자 로그인</button>
+        </div>
+        <div id="adminLoginMsg" class="notice hidden"></div>
+      </div>
+
+      <div id="adminSecurePanel" class="adminPanel hidden">
+        <p class="small">관리자 인증이 완료되었습니다. 이 브라우저에서 접수된 진단 자료를 확인하고 CSV로 내려받을 수 있습니다. 온라인 운영 시에는 Firebase/Supabase/Google Sheets 연동을 권장합니다.</p>
         <div class="btnRow">
           <button class="btn secondary" onclick="renderAdmin()">접수자료 보기</button>
           <button class="btn secondary" onclick="downloadCSV()">CSV 다운로드</button>
           <button class="btn gray" onclick="clearSubmissions()">접수자료 삭제</button>
+          <button class="btn gray" onclick="logoutAdmin()">관리자 로그아웃</button>
         </div>
         <div id="adminTable" style="margin-top:14px"></div>
       </div>
@@ -168,7 +183,7 @@
 </main>
 
 <script>
-const CONFIG = { approvalCode: "SSEM2027" };
+const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
 
 function $(id){ return document.getElementById(id); }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -281,19 +296,54 @@ function runDiagnosis(){
       <p><b>컨설턴트 제언:</b> ${advice}</p>
       <div class="notice">최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결, 학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.</div>
     </div>`;
-  renderAdmin();
+  if(isAdmin()) renderAdmin();
   location.hash = "result";
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
 function resetForm(){["grade","career","univ","major","record"].forEach(id=>$(id).value=""); $("result").classList.add("hidden");}
 
+
+function checkAdmin(){
+  const pw = val("adminPassword");
+  const msg = $("adminLoginMsg");
+  if(pw !== CONFIG.adminPassword){
+    msg.classList.remove("hidden");
+    msg.textContent = "관리자 비밀번호가 일치하지 않습니다.";
+    msg.style.borderColor = "#f2c2c2";
+    msg.style.background = "#fff2f2";
+    return;
+  }
+  sessionStorage.setItem("ssemAdminAuth","true");
+  openAdminPanel();
+}
+function openAdminPanel(){
+  $("adminLoginBox").classList.add("hidden");
+  $("adminSecurePanel").classList.remove("hidden");
+  renderAdmin();
+}
+function logoutAdmin(){
+  sessionStorage.removeItem("ssemAdminAuth");
+  $("adminSecurePanel").classList.add("hidden");
+  $("adminLoginBox").classList.remove("hidden");
+  $("adminPassword").value = "";
+  $("adminTable").innerHTML = "";
+}
+function isAdmin(){
+  return sessionStorage.getItem("ssemAdminAuth") === "true";
+}
+document.addEventListener("DOMContentLoaded", () => {
+  if(isAdmin()) openAdminPanel();
+});
+
 function renderAdmin(){
+  if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; }
   const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]");
   if(!arr.length){ $("adminTable").innerHTML='<p class="small">아직 접수된 자료가 없습니다.</p>'; return; }
   const rows=arr.slice().reverse().map(x=>`<tr><td>${escapeHtml(x.time)}</td><td>${escapeHtml(x.name)}<br>${escapeHtml(x.phone)}</td><td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td><td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td><td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td><td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td></tr>`).join("");
   $("adminTable").innerHTML=`<table><tr><th>접수시각</th><th>신청자</th><th>학교</th><th>성적/활동</th><th>희망지원</th><th>결과</th></tr>${rows}</table>`;
 }
 function downloadCSV(){
+  if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; }
   const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]");
   if(!arr.length){ alert("내려받을 접수자료가 없습니다."); return; }
   const headers=Object.keys(arr[0]);
@@ -301,8 +351,7 @@ function downloadCSV(){
   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ssem_2027_submissions.csv"; a.click();
 }
-function clearSubmissions(){ if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){localStorage.removeItem("ssemSubmissions"); renderAdmin();}}
+function clearSubmissions(){ if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; } if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){localStorage.removeItem("ssemSubmissions"); renderAdmin();}}
 </script>
 </body>
 </html>
-<!-- redeploy -->
