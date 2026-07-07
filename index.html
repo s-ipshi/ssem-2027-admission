@@ -132,7 +132,7 @@
     </span>
   </label>
 
-  <div style="margin-top:12px; padding:14px; background:#f1f5f9; border:1px solid #dbe3ec; border-radius:12px; font-size:13px; color:#475569; line-height:1.7;">
+    <div style="margin-top:12px; padding:14px; background:#f1f5f9; border:1px solid #dbe3ec; border-radius:12px; font-size:13px; color:#475569; line-height:1.7;">
     <strong>개인정보 수집·이용 안내</strong><br>
     수집 항목: 이름, 출신고, 전화번호, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과<br>
     수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공 및 상담 안내<br>
@@ -141,8 +141,9 @@
     개인정보 관리 책임: SSEM 입시연구소 운영자
   </div>
 </div>
-        <button class="btn" onclick="runDiagnosis()">합불 가능성 진단하기</button>
-        <button class="btn secondary" onclick="resetForm()">초기화</button>
+
+<button class="btn" onclick="runDiagnosis()">합불 가능성 진단하기</button>
+<button class="btn secondary" onclick="resetForm()">초기화</button>
       </div>
     </div>
 
@@ -201,7 +202,18 @@
 
 <script>
 const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAPFlYFs3LPdjiT6iP9mnqi3ljh-W9ew3Y_6YA8tVduP4WihZEHhpKRrwd0ZoxKSKe/exec';
 
+function saveToGoogleSheet(payload) {
+  return fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(payload)
+  });
+}
 function $(id){ return document.getElementById(id); }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 function val(id){ return ($(id).value || "").trim(); }
@@ -271,6 +283,13 @@ function schoolTypeAdjust(type, track){
 }
 
 function runDiagnosis(){
+  const privacyAgree = $("privacyAgree")?.checked;
+
+  if (!privacyAgree) {
+    alert("개인정보 수집·이용에 동의해야 무료 진단 신청이 가능합니다.");
+    return;
+  }
+
   const grade=parseFloat(val("grade"));
   if(!grade || grade < 1 || grade > 9){ alert("내신 평균 등급을 1.00~9.00 사이로 입력해 주세요."); return; }
   if(!val("univ") || !val("major")){ alert("지원희망 대학과 학과를 입력해 주세요."); return; }
@@ -313,6 +332,25 @@ function runDiagnosis(){
       <p><b>컨설턴트 제언:</b> ${advice}</p>
       <div class="notice">최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결, 학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.</div>
     </div>`;
+
+  const sheetPayload = {
+    name: val("name"),
+    school: val("school"),
+    phone: val("phone"),
+    grade: val("grade"),
+    schoolType: val("schoolType"),
+    activityLevel: val("activity"),
+    careerHope: val("career"),
+    university: val("univ"),
+    department: val("major"),
+    passRange: `${low}% ~ ${high}%`,
+    failRange: `${failLow}% ~ ${failHigh}%`,
+    diagnosis: `${label} / ${advice}`,
+    privacyAgree: privacyAgree
+  };
+
+  saveToGoogleSheet(sheetPayload);
+
   if(isAdmin()) renderAdmin();
   location.hash = "result";
 }
