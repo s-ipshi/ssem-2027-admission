@@ -508,6 +508,7 @@ const CONFIG = {
 };
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwG8OgL3j-2iJJS_Xoq-BOnedxlr7_AVpICfjslXDdoHrFYycLgpoLHGsnG9_EugAZY/exec";
+
 function $(id){
   return document.getElementById(id);
 }
@@ -550,42 +551,6 @@ function showApproval(msg, ok){
   box.style.color = ok ? "#1b7f50" : "#b83232";
 }
 
-function requestJsonp(action, paramsObj, callbackPrefix, errorMessage){
-  return new Promise((resolve) => {
-    const callbackName = callbackPrefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
-
-    window[callbackName] = function(res){
-      resolve(res || {ok:false, message:"응답이 비어 있습니다."});
-
-      delete window[callbackName];
-      const oldScript = document.getElementById(callbackName);
-      if(oldScript) oldScript.remove();
-    };
-
-    const params = new URLSearchParams({
-      action: action,
-      callback: callbackName,
-      ...paramsObj
-    });
-
-    const script = document.createElement("script");
-    script.id = callbackName;
-    script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
-
-    script.onerror = function(){
-      resolve({
-        ok:false,
-        message:errorMessage || "서버 연결에 실패했습니다. Apps Script 배포 권한과 URL을 확인해 주세요."
-      });
-
-      delete window[callbackName];
-      script.remove();
-    };
-
-    document.body.appendChild(script);
-  });
-}
-
 async function requestApprovalCode(){
   const required = ["name","school","studentPhone","parentPhone"];
 
@@ -598,33 +563,80 @@ async function requestApprovalCode(){
 
   showApproval("개인 승인코드를 자동 발급하고 있습니다. 잠시만 기다려 주세요.", true);
 
-  const res = await requestJsonp(
-    "requestApprovalCode",
-    {
-      name: val("name"),
-      school: val("school"),
-      studentPhone: val("studentPhone"),
-      parentPhone: val("parentPhone")
-    },
-    "requestCodeCallback",
-    "승인코드 발급 요청 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요."
-  );
+  const callbackName = "requestCodeCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
 
-  if(res && res.ok){
-    if(res.code){
-      $("approvalCode").value = res.code;
+  const params = new URLSearchParams({
+    action: "requestApprovalCode",
+    callback: callbackName,
+    name: val("name"),
+    school: val("school"),
+    studentPhone: val("studentPhone"),
+    parentPhone: val("parentPhone"),
+    t: Date.now()
+  });
+
+  const script = document.createElement("script");
+  script.id = callbackName;
+  script.async = true;
+  script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
+
+  const timer = setTimeout(function(){
+    if(window[callbackName]){
+      showApproval(
+        "승인코드 발급 요청 응답이 지연되고 있습니다. GitHub의 GOOGLE_SCRIPT_URL이 현재 Apps Script 배포 URL과 같은지 확인해 주세요.",
+        false
+      );
+
+      delete window[callbackName];
+
+      const oldScript = document.getElementById(callbackName);
+      if(oldScript) oldScript.remove();
+    }
+  }, 15000);
+
+  window[callbackName] = function(res){
+    clearTimeout(timer);
+
+    if(res && res.ok){
+      if(res.code && $("approvalCode")){
+        $("approvalCode").value = res.code;
+      }
+
+      showApproval(
+        res.message || "개인 승인코드가 발급되었습니다. 승인코드 입력란에 자동 입력되었습니다. 이제 [승인 확인]을 눌러 주세요.",
+        true
+      );
+    } else {
+      showApproval(
+        (res && res.message) ? res.message : "승인코드 발급 요청에 실패했습니다.",
+        false
+      );
     }
 
+    delete window[callbackName];
+
+    const oldScript = document.getElementById(callbackName);
+    if(oldScript) oldScript.remove();
+  };
+
+  script.onerror = function(){
+    clearTimeout(timer);
+
     showApproval(
-      res.message || "개인 승인코드가 발급되었습니다. 승인코드 입력란에 자동 입력되었습니다. 이제 [승인 확인]을 눌러 주세요.",
-      true
+      "승인코드 발급 요청 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요.",
+      false
     );
-  } else {
-    showApproval((res && res.message) ? res.message : "승인코드 발급 요청에 실패했습니다.", false);
-  }
+
+    console.error("승인코드 발급 요청 실패 URL:", script.src);
+
+    delete window[callbackName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
 }
 
-async function checkApproval(){
+function checkApproval(){
   const required = ["name","school","studentPhone","parentPhone","approvalCode"];
 
   for(const id of required){
@@ -636,32 +648,83 @@ async function checkApproval(){
 
   showApproval("승인코드를 확인하고 있습니다. 잠시만 기다려 주세요.", true);
 
-  const res = await requestJsonp(
-    "checkApproval",
-    {
-      name: val("name"),
-      school: val("school"),
-      studentPhone: val("studentPhone"),
-      parentPhone: val("parentPhone"),
-      code: val("approvalCode")
-    },
-    "approvalCallback",
-    "승인 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요."
-  );
+  const callbackName = "approvalCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
 
-  if(res && res.ok){
-    showApproval(res.message || "승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
-    $("diagnosis").classList.remove("hidden");
+  const params = new URLSearchParams({
+    action: "checkApproval",
+    callback: callbackName,
+    name: val("name"),
+    school: val("school"),
+    studentPhone: val("studentPhone"),
+    parentPhone: val("parentPhone"),
+    code: val("approvalCode"),
+    t: Date.now()
+  });
 
-    setTimeout(() => {
-      $("diagnosis").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, 100);
-  } else {
-    showApproval((res && res.message) ? res.message : "승인 확인에 실패했습니다.", false);
-  }
+  const script = document.createElement("script");
+  script.id = callbackName;
+  script.async = true;
+  script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
+
+  const timer = setTimeout(function(){
+    if(window[callbackName]){
+      showApproval(
+        "승인 확인 응답이 지연되고 있습니다. Apps Script 배포 URL과 GitHub의 GOOGLE_SCRIPT_URL을 확인해 주세요.",
+        false
+      );
+
+      delete window[callbackName];
+
+      const oldScript = document.getElementById(callbackName);
+      if(oldScript) oldScript.remove();
+    }
+  }, 15000);
+
+  window[callbackName] = function(res){
+    clearTimeout(timer);
+
+    if(res && res.ok){
+      showApproval(res.message || "승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
+
+      const diagnosis = $("diagnosis");
+      if(diagnosis){
+        diagnosis.classList.remove("hidden");
+
+        setTimeout(() => {
+          diagnosis.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }, 100);
+      }
+    } else {
+      showApproval(
+        (res && res.message) ? res.message : "승인 확인에 실패했습니다.",
+        false
+      );
+    }
+
+    delete window[callbackName];
+
+    const oldScript = document.getElementById(callbackName);
+    if(oldScript) oldScript.remove();
+  };
+
+  script.onerror = function(){
+    clearTimeout(timer);
+
+    showApproval(
+      "승인 확인 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요.",
+      false
+    );
+
+    console.error("승인 확인 실패 URL:", script.src);
+
+    delete window[callbackName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
 }
 
 function baselineByTarget(univ, major, track){
