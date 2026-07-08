@@ -8,30 +8,41 @@
 
   <style>
     :root{
-      --blue:#1e5aa8; --blue2:#2f78d6; --navy:#15345f; --gray:#f3f6f9;
-      --line:#d9e2ec; --text:#172033; --muted:#60708a; --card:#ffffff;
-      --success:#1b7f50; --warn:#b7791f; --danger:#b83232;
-      --shadow: 0 18px 50px rgba(18, 49, 86, .12);
-      --radius: 22px;
+      --blue:#1e5aa8;
+      --blue2:#2f78d6;
+      --navy:#15345f;
+      --line:#d9e2ec;
+      --text:#172033;
+      --muted:#60708a;
+      --card:#ffffff;
+      --success:#1b7f50;
+      --danger:#b83232;
+      --warn:#b7791f;
+      --shadow:0 18px 50px rgba(18,49,86,.12);
+      --radius:22px;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
       color:var(--text);
       background:linear-gradient(180deg,#eef5ff,#f7f9fc 38%,#fff);
     }
+
     a{color:var(--blue)}
     .wrap{max-width:1120px;margin:auto;padding:22px}
+
     header{
       position:sticky;
       top:0;
       z-index:5;
-      background:rgba(247,250,253,.86);
+      background:rgba(247,250,253,.9);
       backdrop-filter:blur(14px);
       border-bottom:1px solid var(--line);
     }
+
     .nav{
       display:flex;
       align-items:center;
@@ -41,6 +52,7 @@
       margin:auto;
       padding:14px 22px;
     }
+
     .brand{
       display:flex;
       align-items:center;
@@ -48,6 +60,7 @@
       font-weight:800;
       color:var(--navy);
     }
+
     .logo{
       width:40px;
       height:40px;
@@ -59,6 +72,7 @@
       font-weight:900;
       box-shadow:0 10px 24px rgba(30,90,168,.25);
     }
+
     .pill{
       border:1px solid #c7d7ea;
       background:white;
@@ -67,6 +81,7 @@
       padding:8px 12px;
       font-size:13px;
     }
+
     .hero{
       display:grid;
       grid-template-columns:1.05fr .95fr;
@@ -74,6 +89,7 @@
       align-items:center;
       padding:48px 0 34px;
     }
+
     h1{
       font-size:clamp(32px,5vw,56px);
       line-height:1.06;
@@ -81,37 +97,39 @@
       letter-spacing:-.045em;
       color:#0f2a4f;
     }
+
     h2{font-size:24px;margin:0 0 16px;color:#122d55}
     h3{font-size:18px;margin:0 0 10px;color:#15345f}
     p{line-height:1.68}
     .lead{font-size:18px;color:#52627a;margin:0 0 24px}
+
     .heroCard,.card{
       background:var(--card);
       border:1px solid var(--line);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
     }
+
     .heroCard{padding:24px}
+    .section{padding:22px 0}
+    .card{padding:24px;margin-bottom:18px}
+
     .grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:14px;
     }
+
     .metric{
       background:#f7fbff;
       border:1px solid #d9e9fb;
       border-radius:18px;
       padding:16px;
     }
+
     .metric b{font-size:26px;color:var(--blue)}
-    .metric span{
-      display:block;
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
-    }
-    .section{padding:22px 0}
-    .card{padding:24px;margin-bottom:18px}
+    .metric span{display:block;color:var(--muted);font-size:13px;margin-top:6px}
+
     label{
       display:block;
       font-weight:700;
@@ -119,6 +137,7 @@
       margin:12px 0 7px;
       color:#263b5c;
     }
+
     input,select,textarea{
       width:100%;
       border:1px solid #ccd7e3;
@@ -129,17 +148,22 @@
       color:var(--text);
       outline:none;
     }
+
     input:focus,select:focus,textarea:focus{
       border-color:var(--blue2);
       box-shadow:0 0 0 4px rgba(47,120,214,.13);
     }
+
     textarea{min-height:90px;resize:vertical}
+
     .formGrid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
       gap:14px;
     }
+
     .full{grid-column:1/-1}
+
     .btn{
       appearance:none;
       border:0;
@@ -151,32 +175,39 @@
       color:white;
       box-shadow:0 12px 24px rgba(30,90,168,.25);
     }
+
     .btn.secondary{
       background:#eef4fb;
       color:#17345c;
       box-shadow:none;
       border:1px solid #d8e5f2;
     }
+
     .btn.gray{
       background:#f0f2f5;
       color:#263142;
       box-shadow:none;
       border:1px solid #d6dce5;
     }
+
     .btnRow{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       margin-top:18px;
     }
+
     .notice{
       background:#f5f8fc;
       border:1px solid #d9e2ec;
       border-radius:18px;
       padding:16px;
       color:#53637b;
+      margin-top:16px;
     }
+
     .hidden{display:none!important}
+
     .resultBox{
       border-radius:20px;
       border:1px solid #d8e5f2;
@@ -184,6 +215,7 @@
       background:#fbfdff;
       margin-top:14px;
     }
+
     table{
       width:100%;
       border-collapse:collapse;
@@ -191,6 +223,7 @@
       border-radius:16px;
       overflow:hidden;
     }
+
     th,td{
       border-bottom:1px solid #e5edf5;
       padding:12px;
@@ -198,8 +231,10 @@
       font-size:14px;
       vertical-align:top;
     }
+
     th{background:#f2f6fb;color:#263b5c}
     .small{font-size:13px;color:var(--muted)}
+
     footer{
       border-top:1px solid var(--line);
       margin-top:30px;
@@ -207,6 +242,7 @@
       color:#66758c;
       font-size:13px;
     }
+
     .adminPanel{
       background:#f7f9fc;
       border:1px dashed #b8c7d9;
@@ -238,6 +274,7 @@
 </header>
 
 <main class="wrap">
+
   <section class="hero">
     <div>
       <div class="pill" style="display:inline-block">SSEM 입시연구소 수시 합불 예측 시뮬레이터</div>
@@ -255,9 +292,9 @@
     <div class="heroCard">
       <h3>진단 흐름</h3>
       <div class="grid" style="grid-template-columns:1fr">
-        <div class="metric"><b>01</b><span>이름·출신고·전화번호 승인 확인</span></div>
-        <div class="metric"><b>02</b><span>내신·고교 유형·학생부 활동·희망 전공 입력</span></div>
-        <div class="metric"><b>03</b><span>지원희망 대학·학과별 합격/불합격 % 범위 산출</span></div>
+        <div class="metric"><b>01</b><span>이름·출신고·전화번호 입력</span></div>
+        <div class="metric"><b>02</b><span>개인 승인코드 자동 발급 및 승인 확인</span></div>
+        <div class="metric"><b>03</b><span>수시 합불 가능성 무료 진단</span></div>
       </div>
       <p class="small">
         ※ 본 진단은 상담용 예측 모델입니다. 최종 지원 전 대학별 수시모집요강,
@@ -283,7 +320,7 @@
 
         <div>
           <label>출신고</label>
-          <input id="school" placeholder="예: SSEM고등학교">
+          <input id="school" placeholder="예: 대전고">
         </div>
 
         <div>
@@ -466,7 +503,10 @@
 </main>
 
 <script>
-const CONFIG = { adminPassword: "SSEMADMIN2027" };
+const CONFIG = {
+  adminPassword: "SSEMADMIN2027"
+};
+
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwG8OgL3j-2iJJS_Xoq-BOnedxlr7_AVpICfjslXDdoHrFYycLgpoLHGsnG9_EugAZY/exec";
 
 function $(id){
@@ -511,61 +551,43 @@ function showApproval(msg, ok){
   box.style.color = ok ? "#1b7f50" : "#b83232";
 }
 
-function checkApproval(){
-  const required = ["name","school","studentPhone","parentPhone","approvalCode"];
+function requestJsonp(action, paramsObj, callbackPrefix, errorMessage){
+  return new Promise((resolve) => {
+    const callbackName = callbackPrefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
 
-  for(const id of required){
-    if(!val(id)){
-      showApproval("이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드를 모두 입력해 주세요.", false);
-      return;
-    }
-  }
+    window[callbackName] = function(res){
+      resolve(res || {ok:false, message:"응답이 비어 있습니다."});
 
-  showApproval("승인코드를 확인하고 있습니다. 잠시만 기다려 주세요.", true);
+      delete window[callbackName];
+      const oldScript = document.getElementById(callbackName);
+      if(oldScript) oldScript.remove();
+    };
 
-  const callbackName = "approvalCallback_" + Date.now();
+    const params = new URLSearchParams({
+      action: action,
+      callback: callbackName,
+      ...paramsObj
+    });
 
-  window[callbackName] = function(res){
-    if(res && res.ok){
-      showApproval(res.message || "승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
-      $("diagnosis").classList.remove("hidden");
+    const script = document.createElement("script");
+    script.id = callbackName;
+    script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
 
-      setTimeout(() => {
-        $("diagnosis").scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    } else {
-      showApproval((res && res.message) ? res.message : "승인 확인에 실패했습니다.", false);
-    }
+    script.onerror = function(){
+      resolve({
+        ok:false,
+        message:errorMessage || "서버 연결에 실패했습니다. Apps Script 배포 권한과 URL을 확인해 주세요."
+      });
 
-    delete window[callbackName];
-    const oldScript = document.getElementById(callbackName);
-    if(oldScript) oldScript.remove();
-  };
+      delete window[callbackName];
+      script.remove();
+    };
 
-  const params = new URLSearchParams({
-    action: "checkApproval",
-    callback: callbackName,
-    name: val("name"),
-    school: val("school"),
-    studentPhone: val("studentPhone"),
-    parentPhone: val("parentPhone"),
-    code: val("approvalCode")
+    document.body.appendChild(script);
   });
-
-  const script = document.createElement("script");
-  script.id = callbackName;
-  script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
-
-  script.onerror = function(){
-    showApproval("승인 서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.", false);
-    delete window[callbackName];
-    script.remove();
-  };
-
-  document.body.appendChild(script);
 }
 
-function requestApprovalCode(){
+async function requestApprovalCode(){
   const required = ["name","school","studentPhone","parentPhone"];
 
   for(const id of required){
@@ -577,53 +599,78 @@ function requestApprovalCode(){
 
   showApproval("개인 승인코드를 자동 발급하고 있습니다. 잠시만 기다려 주세요.", true);
 
-  const callbackName = "requestCodeCallback_" + Date.now();
+  const res = await requestJsonp(
+    "requestApprovalCode",
+    {
+      name: val("name"),
+      school: val("school"),
+      studentPhone: val("studentPhone"),
+      parentPhone: val("parentPhone")
+    },
+    "requestCodeCallback",
+    "승인코드 발급 요청 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요."
+  );
 
-  window[callbackName] = function(res){
-    if(res && res.ok){
-      if(res.code){
-        $("approvalCode").value = res.code;
-      }
-
-      showApproval(
-        res.message || "개인 승인코드가 발급되었습니다. 승인코드 입력란에 자동 입력되었습니다. 이제 [승인 확인]을 눌러 주세요.",
-        true
-      );
-    } else {
-      showApproval((res && res.message) ? res.message : "승인코드 발급 요청에 실패했습니다.", false);
+  if(res && res.ok){
+    if(res.code){
+      $("approvalCode").value = res.code;
     }
 
-    delete window[callbackName];
-    const oldScript = document.getElementById(callbackName);
-    if(oldScript) oldScript.remove();
-  };
+    showApproval(
+      res.message || "개인 승인코드가 발급되었습니다. 승인코드 입력란에 자동 입력되었습니다. 이제 [승인 확인]을 눌러 주세요.",
+      true
+    );
+  } else {
+    showApproval((res && res.message) ? res.message : "승인코드 발급 요청에 실패했습니다.", false);
+  }
+}
 
-  const params = new URLSearchParams({
-    action: "requestApprovalCode",
-    callback: callbackName,
-    name: val("name"),
-    school: val("school"),
-    studentPhone: val("studentPhone"),
-    parentPhone: val("parentPhone")
-  });
+async function checkApproval(){
+  const required = ["name","school","studentPhone","parentPhone","approvalCode"];
 
-  const script = document.createElement("script");
-  script.id = callbackName;
-  script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
+  for(const id of required){
+    if(!val(id)){
+      showApproval("이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드를 모두 입력해 주세요.", false);
+      return;
+    }
+  }
 
-  script.onerror = function(){
-    showApproval("승인코드 발급 요청 서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.", false);
-    delete window[callbackName];
-    script.remove();
-  };
+  showApproval("승인코드를 확인하고 있습니다. 잠시만 기다려 주세요.", true);
 
-  document.body.appendChild(script);
+  const res = await requestJsonp(
+    "checkApproval",
+    {
+      name: val("name"),
+      school: val("school"),
+      studentPhone: val("studentPhone"),
+      parentPhone: val("parentPhone"),
+      code: val("approvalCode")
+    },
+    "approvalCallback",
+    "승인 서버 연결에 실패했습니다. Apps Script 배포 권한과 GOOGLE_SCRIPT_URL을 확인해 주세요."
+  );
+
+  if(res && res.ok){
+    showApproval(res.message || "승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
+    $("diagnosis").classList.remove("hidden");
+
+    setTimeout(() => {
+      $("diagnosis").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 100);
+  } else {
+    showApproval((res && res.message) ? res.message : "승인 확인에 실패했습니다.", false);
+  }
 }
 
 function baselineByTarget(univ, major, track){
   const u = univ.replace(/\s/g,"");
   const m = major.replace(/\s/g,"");
-  let base = 3.2, volatility = 0.28, tier = "일반 모집단위";
+  let base = 3.2;
+  let volatility = 0.28;
+  let tier = "일반 모집단위";
 
   if(/서울대|연세대|고려대|서강대|성균관대|한양대/.test(u)){
     base=1.45; volatility=0.18; tier="최상위권 대학";
@@ -654,7 +701,11 @@ function baselineByTarget(univ, major, track){
   if(track.includes("지역인재")){ base += 0.35; volatility += 0.20; }
   if(track.includes("기회균형")){ base += 0.30; volatility += 0.22; }
 
-  return {base: clamp(base,1.02,6.2), volatility, tier};
+  return {
+    base: clamp(base,1.02,6.2),
+    volatility,
+    tier
+  };
 }
 
 function activityScore(activity, record, career, major, track){
@@ -831,7 +882,10 @@ function runDiagnosis(){
   if(isAdmin()) renderAdmin();
 
   setTimeout(() => {
-    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("result").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
   }, 100);
 }
 
@@ -954,7 +1008,10 @@ function downloadCSV(){
     .concat(arr.map(o => headers.map(h => `"${String(o[h] ?? "").replace(/"/g,'""')}"`).join(",")))
     .join("\n");
 
-  const blob = new Blob(["\ufeff" + csv], {type:"text/csv;charset=utf-8"});
+  const blob = new Blob(["\ufeff" + csv], {
+    type:"text/csv;charset=utf-8"
+  });
+
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "ssem_2027_submissions.csv";
