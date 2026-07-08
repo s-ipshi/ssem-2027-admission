@@ -210,7 +210,7 @@
 </main>
 
 <script>
-const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
+const CONFIG = { adminPassword: "SSEMADMIN2027" };
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_IjEIUZrZ6-As44HPop-EgF3ow1A7annZJhBMCdekNEqXabbbpSUNiVLfuNZkNfGl/exec";
 
 function $(id){ return document.getElementById(id); }
@@ -260,10 +260,48 @@ function checkApproval(){
     }
   }
 
-  if(val("approvalCode") !== CONFIG.approvalCode){
-    showApproval("승인코드가 일치하지 않습니다. SSEM 입시연구소에서 안내받은 코드를 확인해 주세요.", false);
-    return;
-  }
+  showApproval("승인코드를 확인하고 있습니다. 잠시만 기다려 주세요.", true);
+
+  const callbackName = "approvalCallback_" + Date.now();
+
+  window[callbackName] = function(res){
+    if(res && res.ok){
+      showApproval(res.message || "승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
+      $("diagnosis").classList.remove("hidden");
+
+      setTimeout(() => {
+        $("diagnosis").scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    } else {
+      showApproval((res && res.message) ? res.message : "승인 확인에 실패했습니다.", false);
+    }
+
+    delete window[callbackName];
+    const oldScript = document.getElementById(callbackName);
+    if(oldScript) oldScript.remove();
+  };
+
+  const params = new URLSearchParams({
+    action: "checkApproval",
+    callback: callbackName,
+    name: val("name"),
+    school: val("school"),
+    studentPhone: val("studentPhone"),
+    parentPhone: val("parentPhone"),
+    code: val("approvalCode")
+  });
+
+  const script = document.createElement("script");
+  script.id = callbackName;
+  script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
+  script.onerror = function(){
+    showApproval("승인 서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.", false);
+    delete window[callbackName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
+}
 
   showApproval("승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
   $("diagnosis").classList.remove("hidden");
@@ -439,25 +477,27 @@ function runDiagnosis(){
   `;
 
   const sheetPayload = {
-    requestType: "무료진단",
-    name: val("name"),
-    school: val("school"),
-    studentPhone: val("studentPhone"),
-    parentPhone: val("parentPhone"),
-    grade: val("grade"),
-    schoolType: val("schoolType"),
-    activityLevel: val("activity"),
-    track: val("track"),
-    careerHope: val("career"),
-    university: val("univ"),
-    department: val("major"),
-    record: val("record"),
-    passRange: `${low}% ~ ${high}%`,
-    failRange: `${failLow}% ~ ${failHigh}%`,
-    diagnosis: `${label} / ${advice}`,
-    paidAnalysisRequest: false,
-    privacyAgree: privacyAgree
-  };
+  action: "saveApplication",
+  requestType: "무료진단",
+  name: val("name"),
+  school: val("school"),
+  studentPhone: val("studentPhone"),
+  parentPhone: val("parentPhone"),
+  approvalCode: val("approvalCode"),
+  grade: val("grade"),
+  schoolType: val("schoolType"),
+  activityLevel: val("activity"),
+  track: val("track"),
+  careerHope: val("career"),
+  university: val("univ"),
+  department: val("major"),
+  record: val("record"),
+  passRange: `${low}% ~ ${high}%`,
+  failRange: `${failLow}% ~ ${failHigh}%`,
+  diagnosis: `${label} / ${advice}`,
+  paidAnalysisRequest: false,
+  privacyAgree: privacyAgree
+};
 
   window.lastSsemPayload = sheetPayload;
   saveToGoogleSheet(sheetPayload);
