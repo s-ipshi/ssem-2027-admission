@@ -99,7 +99,15 @@
       <div class="formGrid">
         <div><label>진단희망자 이름</label><input id="name" placeholder="예: 김수시"></div>
         <div><label>출신고</label><input id="school" placeholder="예: SSEM고등학교"></div>
-        <div><label>전화번호</label><input id="phone" placeholder="예: 010-1234-5678"></div>
+       <div>
+  <label>학생 전화번호</label>
+  <input id="studentPhone" placeholder="예: 010-1234-5678">
+</div>
+
+<div>
+  <label>학부모 전화번호</label>
+  <input id="parentPhone" placeholder="예: 010-1234-5678">
+</div>
         <div><label>승인코드</label><input id="approvalCode" placeholder="운영자 제공 코드"></div>
       </div>
       <div class="btnRow">
@@ -202,7 +210,7 @@
 
 <script>
 const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAPFlYFs3LPdjiT6iP9mnqi3ljh-W9ew3Y_6YA8tVduP4WihZEHhpKRrwd0ZoxKSKe/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_IjEIUZrZ6-As44HPop-EgF3ow1A7annZJhBMCdekNEqXabbbpSUNiVLfuNZkNfGl/exec';
 
 function saveToGoogleSheet(payload) {
   return fetch(GOOGLE_SCRIPT_URL, {
@@ -219,9 +227,11 @@ function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 function val(id){ return ($(id).value || "").trim(); }
 
 function checkApproval(){
-  const required = ["name","school","phone","approvalCode"];
+  const required = ["name","school","studentPhone","parentPhone","approvalCode"];
   for(const id of required){
-    if(!val(id)){ showApproval("이름, 출신고, 전화번호, 승인코드를 모두 입력해 주세요.", false); return; }
+  if(!val(id)){
+  showApproval("이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드를 모두 입력해 주세요.", false);
+  return;
   }
   if(val("approvalCode") !== CONFIG.approvalCode){
     showApproval("승인코드가 일치하지 않습니다. SSEM 입시연구소에서 안내받은 코드를 확인해 주세요.", false); return;
@@ -321,17 +331,38 @@ function runDiagnosis(){
 
   $("result").classList.remove("hidden");
   $("result").innerHTML = `
-    <h2>3. 진단 결과</h2>
-    <div class="resultBox">
-      <span class="tag ${cls}">${label}</span>
-      <h3 style="margin-top:14px">${escapeHtml(univ)} ${escapeHtml(major)} · ${escapeHtml(track)}</h3>
-      <p><b>합격 가능성:</b> ${low}% ~ ${high}%</p>
-      <div class="bar"><i style="width:${prob}%"></i></div>
-      <p><b>불합격 가능성:</b> ${failLow}% ~ ${failHigh}%</p>
-      <p><b>분석 기준:</b> ${b.tier}, 기준 내신 약 ${b.base.toFixed(2)}등급, 학생부 활동 보정, 고교 유형 보정, 2027학년도 전형 변수 반영</p>
-      <p><b>컨설턴트 제언:</b> ${advice}</p>
-      <div class="notice">최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결, 학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.</div>
-    </div>`;
+  <h2>3. 진단 결과</h2>
+
+  <div class="resultBox">
+    <h3>${label}</h3>
+    <p>합격 가능성: ${low}% ~ ${high}%</p>
+    <p>불합격 가능성: ${failLow}% ~ ${failHigh}%</p>
+    <p>${advice}</p>
+
+    <div class="notice">
+      최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결,
+      학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.
+    </div>
+  </div>
+
+  <div class="resultBox" style="margin-top:16px; border:2px solid #1e5aa8; background:#f7fbff;">
+    <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+      <input 
+        type="checkbox" 
+        id="paidAnalysisRequest" 
+        onchange="submitPaidAnalysisRequest()"
+        style="width:auto; margin-top:5px;"
+      >
+      <span>
+        <b>[심층 지원분석 희망(유료)]</b><br>
+        <span class="small">
+          체크하면 입력한 학생 정보와 진단결과가 [신청 자료] 구글 시트에 저장되며,
+          SSEM 입시연구소에서 심층 지원분석 안내를 위해 연락드릴 수 있습니다.
+        </span>
+      </span>
+    </label>
+  </div>
+`;
 
   const sheetPayload = {
     name: val("name"),
@@ -349,6 +380,7 @@ function runDiagnosis(){
     privacyAgree: privacyAgree
   };
 
+  sawindow.lastSsemPayload = sheetPayload;
   saveToGoogleSheet(sheetPayload);
 
   if(isAdmin()) renderAdmin();
@@ -407,6 +439,26 @@ function downloadCSV(){
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ssem_2027_submissions.csv"; a.click();
 }
 function clearSubmissions(){ if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; } if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){localStorage.removeItem("ssemSubmissions"); renderAdmin();}}
+function submitPaidAnalysisRequest() {
+  const checked = $("paidAnalysisRequest")?.checked;
+
+  if (!checked) return;
+
+  if (!window.lastSsemPayload) {
+    alert("먼저 진단을 완료한 뒤 신청해 주세요.");
+    return;
+  }
+
+  const paidPayload = {
+    ...window.lastSsemPayload,
+    requestType: "심층 지원분석 희망(유료)",
+    paidAnalysisRequest: true
+  };
+
+  saveToGoogleSheet(paidPayload);
+
+  alert("심층 지원분석 희망 신청이 접수되었습니다. SSEM 입시연구소에서 안내 연락을 드릴 수 있습니다.");
+}
 </script>
 </body>
 </html>
