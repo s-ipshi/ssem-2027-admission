@@ -80,6 +80,8 @@
       border-radius:999px;
       padding:8px 12px;
       font-size:13px;
+      text-decoration:none;
+      display:inline-block;
     }
 
     .hero{
@@ -174,6 +176,9 @@
       background:linear-gradient(135deg,var(--blue),var(--blue2));
       color:white;
       box-shadow:0 12px 24px rgba(30,90,168,.25);
+      text-decoration:none;
+      display:inline-block;
+      font-size:15px;
     }
 
     .btn.secondary{
@@ -204,6 +209,19 @@
       padding:16px;
       color:#53637b;
       margin-top:16px;
+      line-height:1.7;
+    }
+
+    .notice.important{
+      background:#fffaf0;
+      border-color:#f2d49b;
+      color:#6f4e14;
+    }
+
+    .notice.safe{
+      background:#f0fbf5;
+      border-color:#bfe5d1;
+      color:#1b7f50;
     }
 
     .hidden{display:none!important}
@@ -234,6 +252,7 @@
 
     th{background:#f2f6fb;color:#263b5c}
     .small{font-size:13px;color:var(--muted)}
+    .tiny{font-size:12px;color:#718096;line-height:1.65}
 
     footer{
       border-top:1px solid var(--line);
@@ -241,6 +260,32 @@
       padding:24px 0;
       color:#66758c;
       font-size:13px;
+      line-height:1.8;
+    }
+
+    .policyBox{
+      background:#f8fafc;
+      border:1px solid #dbe3ec;
+      border-radius:16px;
+      padding:16px;
+      margin-top:12px;
+      font-size:13px;
+      color:#475569;
+      line-height:1.8;
+    }
+
+    .checkLabel{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      line-height:1.5;
+      cursor:pointer;
+      margin-top:12px;
+    }
+
+    .checkLabel input{
+      width:auto;
+      margin-top:5px;
     }
 
     .adminPanel{
@@ -269,7 +314,11 @@
         <span class="small">운영자: SSEM 입시연구소</span>
       </div>
     </div>
-    <div class="pill">승인 확인 후 진단 가능</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a class="pill" href="#approval">무료 진단</a>
+      <a class="pill" href="#privacy">개인정보 처리방침</a>
+      <a class="pill" href="#method">진단 기준</a>
+    </div>
   </div>
 </header>
 
@@ -277,28 +326,36 @@
 
   <section class="hero">
     <div>
-      <div class="pill" style="display:inline-block">SSEM 입시연구소 수시 합불 예측 시뮬레이터</div>
+      <div class="pill">SSEM 입시연구소 수시 합불 예측 시뮬레이터</div>
       <h1>2027 수시 지원,<br>가능성을 숫자로 점검합니다.</h1>
       <p class="lead">
         내신 평균, 고교 유형, 창체활동, 진로희망, 지원희망 대학·학과를 입력하면
         수시 전형의 합격·불합격 가능성 범위를 무료로 진단합니다.
       </p>
+
+      <div class="notice important">
+        본 진단은 상담용 예측 자료이며, 특정 대학·학과의 합격을 보장하지 않습니다.
+        실제 합격 여부는 대학별 모집요강, 전형 방법, 경쟁률, 수능최저 충족 여부,
+        서류평가, 면접 결과 등에 따라 달라질 수 있습니다.
+      </div>
+
       <div class="btnRow">
-        <a class="btn" href="#approval" style="text-decoration:none">무료 진단 시작</a>
-        <a class="btn secondary" href="#method" style="text-decoration:none">진단 기준 보기</a>
+        <a class="btn" href="#approval">무료 진단 시작</a>
+        <a class="btn secondary" href="#method">진단 기준 보기</a>
+        <a class="btn secondary" href="#privacy">개인정보 처리방침 보기</a>
       </div>
     </div>
 
     <div class="heroCard">
       <h3>진단 흐름</h3>
       <div class="grid" style="grid-template-columns:1fr">
-        <div class="metric"><b>01</b><span>이름·출신고·전화번호 입력</span></div>
+        <div class="metric"><b>01</b><span>이름·출신고·학생 및 학부모 전화번호 입력</span></div>
         <div class="metric"><b>02</b><span>개인 승인코드 자동 발급 및 승인 확인</span></div>
         <div class="metric"><b>03</b><span>수시 합불 가능성 무료 진단</span></div>
       </div>
       <p class="small">
-        ※ 본 진단은 상담용 예측 모델입니다. 최종 지원 전 대학별 수시모집요강,
-        대학어디가 공개 입결, 수능최저 충족 가능성을 반드시 확인해야 합니다.
+        ※ 최종 지원 전 대학별 입학처 수시모집요강, 대학어디가 공개 입결,
+        학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 확인해야 합니다.
       </p>
     </div>
   </section>
@@ -314,27 +371,27 @@
 
       <div class="formGrid">
         <div>
-          <label>진단희망자 이름</label>
+          <label for="name">진단희망자 이름</label>
           <input id="name" placeholder="예: 김수시">
         </div>
 
         <div>
-          <label>출신고</label>
+          <label for="school">출신고</label>
           <input id="school" placeholder="예: 대전고">
         </div>
 
         <div>
-          <label>학생 전화번호</label>
+          <label for="studentPhone">학생 전화번호</label>
           <input id="studentPhone" placeholder="예: 010-1234-5678">
         </div>
 
         <div>
-          <label>학부모 전화번호</label>
+          <label for="parentPhone">학부모 전화번호</label>
           <input id="parentPhone" placeholder="예: 010-1234-5678">
         </div>
 
         <div>
-          <label>승인코드</label>
+          <label for="approvalCode">승인코드</label>
           <input id="approvalCode" placeholder="예: 자동 발급된 A7K29Q">
           <div class="small" style="margin-top:6px;">
             승인코드가 없다면 아래 [개인 승인코드 발급 요청]을 누르세요.
@@ -342,6 +399,14 @@
           </div>
         </div>
       </div>
+
+      <label class="checkLabel">
+        <input type="checkbox" id="parentContactAgree">
+        <span>
+          학부모 전화번호 입력에 대해 학부모에게 안내하였으며,
+          무료 진단 및 심층 지원분석 안내 목적으로 연락처를 제공하는 것에 동의를 받았음을 확인합니다.
+        </span>
+      </label>
 
       <div class="btnRow">
         <button class="btn" onclick="checkApproval()">승인 확인</button>
@@ -358,12 +423,12 @@
 
       <div class="formGrid">
         <div>
-          <label>내신성적 평균 등급</label>
+          <label for="grade">내신성적 평균 등급</label>
           <input id="grade" type="number" min="1" max="9" step="0.01" placeholder="예: 2.43">
         </div>
 
         <div>
-          <label>고등학교 유형</label>
+          <label for="schoolType">고등학교 유형</label>
           <select id="schoolType">
             <option>일반고</option>
             <option>자율고</option>
@@ -375,7 +440,7 @@
         </div>
 
         <div>
-          <label>학교생활부 창체활동 정도</label>
+          <label for="activity">학교생활부 창체활동 정도</label>
           <select id="activity">
             <option value="상">상</option>
             <option value="중">중</option>
@@ -384,7 +449,7 @@
         </div>
 
         <div>
-          <label>희망 전형</label>
+          <label for="track">희망 전형</label>
           <select id="track">
             <option>학생부교과</option>
             <option>학생부종합</option>
@@ -395,40 +460,43 @@
         </div>
 
         <div class="full">
-          <label>진로희망</label>
+          <label for="career">진로희망</label>
           <input id="career" placeholder="예: 인공지능 연구원, 간호사, 경영컨설턴트">
         </div>
 
         <div>
-          <label>지원희망 대학</label>
+          <label for="univ">지원희망 대학</label>
           <input id="univ" placeholder="예: 연세대, 숭실대, 충남대">
         </div>
 
         <div>
-          <label>지원희망 학과/모집단위</label>
+          <label for="major">지원희망 학과/모집단위</label>
           <input id="major" placeholder="예: 컴퓨터학과, 간호학과, 자유전공학부">
         </div>
 
         <div class="full">
-          <label>학생부/세특/비교과 요약</label>
+          <label for="record">학생부/세특/비교과 요약</label>
           <textarea id="record" placeholder="전공 관련 탐구, 세특 키워드, 동아리, 진로활동 등을 간단히 입력"></textarea>
         </div>
       </div>
 
       <div style="margin-top:18px;">
-        <label style="display:flex; gap:10px; align-items:flex-start; line-height:1.5;">
-          <input type="checkbox" id="privacyAgree" required style="width:auto; margin-top:5px;">
+        <label class="checkLabel">
+          <input type="checkbox" id="privacyAgree">
           <span>
             개인정보 수집·이용에 동의합니다. 동의하지 않을 경우 무료 진단 신청이 제한됩니다.
           </span>
         </label>
 
-        <div style="margin-top:12px; padding:14px; background:#f1f5f9; border:1px solid #dbe3ec; border-radius:12px; font-size:13px; color:#475569; line-height:1.7;">
+        <div class="policyBox">
           <strong>개인정보 수집·이용 안내</strong><br>
-          수집 항목: 이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 학생부 요약, 진단결과, 심층 지원분석 희망 여부<br>
+          수집 항목: 이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드, 내신성적 평균, 고등학교 유형,
+          창체활동 수준, 진로희망, 지원희망 대학 및 학과, 학생부 요약, 진단결과, 심층 지원분석 희망 여부<br>
           수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공, 승인 확인, 심층 지원분석 신청자 상담 안내<br>
           보유 기간: 수집일로부터 1년 또는 삭제 요청 시 즉시 삭제<br>
           제3자 제공: 없음<br>
+          처리 도구: Google Sheets 및 Google Apps Script를 통한 신청 자료 저장·관리<br>
+          동의 거부권: 개인정보 수집·이용에 동의하지 않을 수 있으나, 이 경우 무료 진단 신청이 제한됩니다.<br>
           개인정보 관리 책임: SSEM 입시연구소 운영자
         </div>
       </div>
@@ -446,67 +514,164 @@
     <div class="card">
       <h2>진단 기준</h2>
       <table>
-        <tr><th>반영 요소</th><th>설명</th></tr>
-        <tr><td>전년도 입결 기준선</td><td>대학·학과 키워드에 따라 상위권, 수도권, 지역거점, 보건의료, 의약학, 일반 모집단위의 기준 내신을 다르게 적용합니다.</td></tr>
-        <tr><td>2027 변수</td><td>무전공 선발, 수능최저 변화, 논술 변화, 학폭 반영, 지역인재·최저완화에 따른 지원자 쏠림 가능성을 위험 보정값으로 반영합니다.</td></tr>
-        <tr><td>학생부종합 보정</td><td>창체활동과 세특/비교과 요약의 전공 연계성을 가산·감산합니다.</td></tr>
-        <tr><td>결과 표기</td><td>합격 가능성과 불합격 가능성을 단정 수치가 아닌 % 범위로 표기합니다.</td></tr>
+        <tr>
+          <th>반영 요소</th>
+          <th>설명</th>
+        </tr>
+        <tr>
+          <td>전년도 입결 기준선</td>
+          <td>대학·학과 키워드에 따라 상위권, 수도권, 지역거점, 보건의료, 의약학, 일반 모집단위의 기준 내신을 다르게 적용합니다.</td>
+        </tr>
+        <tr>
+          <td>2027 변수</td>
+          <td>무전공 선발, 수능최저 변화, 논술 변화, 학교폭력 조치사항 반영, 지역인재·최저완화에 따른 지원자 쏠림 가능성을 위험 보정값으로 반영합니다.</td>
+        </tr>
+        <tr>
+          <td>학생부종합 보정</td>
+          <td>창체활동과 세특/비교과 요약의 전공 연계성을 가산·감산합니다.</td>
+        </tr>
+        <tr>
+          <td>결과 표기</td>
+          <td>합격 가능성과 불합격 가능성을 단정 수치가 아닌 % 범위로 표기합니다.</td>
+        </tr>
       </table>
-      <p class="small">
-        ※ 본 진단은 상담용 예측 모델입니다. 대학별 입학처 최종 수시모집요강,
-        대학어디가 공개 입결, 학교별 추천 가능 여부, 수능최저 충족 가능성 확인이 반드시 필요합니다.
-      </p>
+
+      <div class="notice important">
+        본 진단 결과는 SSEM 입시연구소의 상담용 예측 자료입니다.
+        특정 대학·학과의 합격을 보장하지 않으며, 최종 지원 전 대학별 입학처 최종 수시모집요강,
+        대학어디가 공개 입결, 학교장추천 가능 여부, 수능최저 충족 가능성, 면접 및 서류평가 요소를 반드시 재확인해야 합니다.
+      </div>
     </div>
   </section>
 
-  <section id="admin" class="section">
+  <section id="privacy" class="section">
     <div class="card">
-      <h2>관리자 확인</h2>
+      <h2>개인정보 처리방침</h2>
 
-      <div id="adminLoginBox" class="adminPanel">
-        <p class="small">
-          운영자만 접수자료를 확인할 수 있습니다.
-          관리자 비밀번호를 입력하면 이 브라우저의 관리자 화면이 열립니다.
-        </p>
-        <div class="formGrid">
-          <div>
-            <label>관리자 비밀번호</label>
-            <input id="adminPassword" type="password" placeholder="운영자 전용 비밀번호">
-          </div>
-        </div>
-        <div class="btnRow">
-          <button class="btn secondary" onclick="checkAdmin()">관리자 로그인</button>
-        </div>
-        <div id="adminLoginMsg" class="notice hidden"></div>
+      <p class="small">
+        SSEM 입시연구소는 2027학년도 수시 전형 지원 합불 무료 진단 및 심층 지원분석 안내를 위해
+        아래와 같이 개인정보를 수집·이용합니다.
+      </p>
+
+      <table>
+        <tr>
+          <th>구분</th>
+          <th>내용</th>
+        </tr>
+        <tr>
+          <td>수집 항목</td>
+          <td>
+            이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드, 내신성적 평균, 고등학교 유형,
+            창체활동 수준, 진로희망, 지원희망 대학 및 학과, 학생부/세특/비교과 요약,
+            진단결과, 심층 지원분석 희망 여부
+          </td>
+        </tr>
+        <tr>
+          <td>수집 목적</td>
+          <td>
+            무료 수시 합불 가능성 진단 제공, 승인 확인, 신청자 본인 확인,
+            심층 지원분석 희망자 상담 안내
+          </td>
+        </tr>
+        <tr>
+          <td>보유 기간</td>
+          <td>
+            수집일로부터 1년 또는 정보주체의 삭제 요청 시 즉시 삭제
+          </td>
+        </tr>
+        <tr>
+          <td>제3자 제공</td>
+          <td>
+            개인정보를 외부 제3자에게 제공하지 않습니다.
+          </td>
+        </tr>
+        <tr>
+          <td>처리 도구</td>
+          <td>
+            신청 자료 관리를 위해 Google Sheets 및 Google Apps Script를 사용할 수 있습니다.
+            Google Sheet 접근 권한은 운영자 계정으로 제한합니다.
+          </td>
+        </tr>
+        <tr>
+          <td>동의 거부권</td>
+          <td>
+            개인정보 수집·이용에 동의하지 않을 수 있습니다. 다만 동의하지 않을 경우 무료 진단 신청이 제한될 수 있습니다.
+          </td>
+        </tr>
+        <tr>
+          <td>열람·정정·삭제 요청</td>
+          <td>
+            신청자는 본인의 개인정보에 대해 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다.
+            삭제 요청이 접수되면 운영자는 확인 후 즉시 삭제합니다.
+          </td>
+        </tr>
+        <tr>
+          <td>관리 책임</td>
+          <td>
+            SSEM 입시연구소 운영자
+          </td>
+        </tr>
+      </table>
+
+      <div class="notice">
+        만 14세 미만 학생이 신청하는 경우 법정대리인의 동의가 필요합니다.
+        학부모 전화번호를 입력하는 경우 해당 연락처 제공에 대해 학부모에게 안내하고 동의를 받은 후 입력해야 합니다.
       </div>
+    </div>
+  </section>
 
-      <div id="adminSecurePanel" class="adminPanel hidden">
+  <section id="security" class="section">
+    <div class="card">
+      <h2>운영자 보안 안내</h2>
+
+      <div class="adminPanel">
+        <h3>접수자료 확인 방법</h3>
         <p class="small">
-          관리자 인증이 완료되었습니다. 이 브라우저에서 접수된 진단 자료를 확인하고 CSV로 내려받을 수 있습니다.
-          실제 운영 자료는 구글시트 [신청 자료]에도 저장됩니다.
+          개인정보 보호를 위해 이 공개 홈페이지에는 관리자 비밀번호와 접수자료 열람 기능을 넣지 않습니다.
+          접수자료는 운영자 권한이 있는 Google Sheet에서만 확인하세요.
         </p>
-        <div class="btnRow">
-          <button class="btn secondary" onclick="renderAdmin()">접수자료 보기</button>
-          <button class="btn secondary" onclick="downloadCSV()">CSV 다운로드</button>
-          <button class="btn gray" onclick="clearSubmissions()">접수자료 삭제</button>
-          <button class="btn gray" onclick="logoutAdmin()">관리자 로그아웃</button>
-        </div>
-        <div id="adminTable" style="margin-top:14px"></div>
+
+        <table>
+          <tr>
+            <th>점검 항목</th>
+            <th>권장 설정</th>
+          </tr>
+          <tr>
+            <td>Google Sheet 공유 설정</td>
+            <td>비공개 또는 운영자 계정만 보기/수정 가능</td>
+          </tr>
+          <tr>
+            <td>Apps Script 배포 권한</td>
+            <td>필요한 기능만 허용하고, URL을 외부에 불필요하게 공유하지 않기</td>
+          </tr>
+          <tr>
+            <td>관리자 비밀번호</td>
+            <td>index.html, script.js 등 공개 코드에 저장하지 않기</td>
+          </tr>
+          <tr>
+            <td>개인정보 보관</td>
+            <td>수집일로부터 1년 또는 삭제 요청 시 즉시 삭제</td>
+          </tr>
+          <tr>
+            <td>자료 다운로드</td>
+            <td>운영자 PC에 내려받은 CSV, 엑셀 파일은 외부 공유 금지</td>
+          </tr>
+        </table>
       </div>
     </div>
   </section>
 
   <footer>
     <b>SSEM 입시연구소</b> · 2027학년도 수시 전형 지원 합불 무료 진단<br>
-    개인정보 안내: 입력 자료는 무료 진단 및 상담 안내 목적으로 사용됩니다. 최종 지원 전 대학별 최종 모집요강을 반드시 확인해야 합니다.
+    <a href="#privacy">개인정보 처리방침</a> ·
+    <a href="#method">진단 기준</a> ·
+    <a href="#security">운영자 보안 안내</a><br>
+    본 진단은 상담용 예측 자료이며 특정 대학·학과의 합격을 보장하지 않습니다.
+    최종 지원 전 대학별 최종 모집요강을 반드시 확인해야 합니다.
   </footer>
 </main>
 
 <script>
-const CONFIG = {
-  adminPassword: "SSEMADMIN2027"
-};
-
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwG8OgL3j-2iJJS_Xoq-BOnedxlr7_AVpICfjslXDdoHrFYycLgpoLHGsnG9_EugAZY/exec";
 
 function $(id){
@@ -516,6 +681,11 @@ function $(id){
 function val(id){
   const el = $(id);
   return el ? (el.value || "").trim() : "";
+}
+
+function checked(id){
+  const el = $(id);
+  return !!(el && el.checked);
 }
 
 function clamp(n,min,max){
@@ -551,6 +721,11 @@ function showApproval(msg, ok){
   box.style.color = ok ? "#1b7f50" : "#b83232";
 }
 
+function validatePhoneText(phone){
+  const onlyNum = phone.replace(/[^0-9]/g, "");
+  return onlyNum.length >= 10 && onlyNum.length <= 11;
+}
+
 async function requestApprovalCode(){
   const required = ["name","school","studentPhone","parentPhone"];
 
@@ -559,6 +734,16 @@ async function requestApprovalCode(){
       showApproval("승인코드 발급 요청을 위해 이름, 출신고, 학생 전화번호, 학부모 전화번호를 모두 입력해 주세요.", false);
       return;
     }
+  }
+
+  if(!validatePhoneText(val("studentPhone")) || !validatePhoneText(val("parentPhone"))){
+    showApproval("학생 전화번호와 학부모 전화번호를 정확히 입력해 주세요. 예: 010-1234-5678", false);
+    return;
+  }
+
+  if(!checked("parentContactAgree")){
+    showApproval("학부모 전화번호 제공 동의 확인에 체크해야 승인코드 발급 요청이 가능합니다.", false);
+    return;
   }
 
   showApproval("개인 승인코드를 자동 발급하고 있습니다. 잠시만 기다려 주세요.", true);
@@ -572,6 +757,7 @@ async function requestApprovalCode(){
     school: val("school"),
     studentPhone: val("studentPhone"),
     parentPhone: val("parentPhone"),
+    parentContactAgree: checked("parentContactAgree") ? "동의확인" : "미확인",
     t: Date.now()
   });
 
@@ -646,6 +832,16 @@ function checkApproval(){
     }
   }
 
+  if(!validatePhoneText(val("studentPhone")) || !validatePhoneText(val("parentPhone"))){
+    showApproval("학생 전화번호와 학부모 전화번호를 정확히 입력해 주세요. 예: 010-1234-5678", false);
+    return;
+  }
+
+  if(!checked("parentContactAgree")){
+    showApproval("학부모 전화번호 제공 동의 확인에 체크해야 승인 확인이 가능합니다.", false);
+    return;
+  }
+
   showApproval("승인코드를 확인하고 있습니다. 잠시만 기다려 주세요.", true);
 
   const callbackName = "approvalCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
@@ -657,6 +853,7 @@ function checkApproval(){
     school: val("school"),
     studentPhone: val("studentPhone"),
     parentPhone: val("parentPhone"),
+    parentContactAgree: checked("parentContactAgree") ? "동의확인" : "미확인",
     code: val("approvalCode"),
     t: Date.now()
   });
@@ -806,10 +1003,15 @@ function schoolTypeAdjust(type, track){
 }
 
 function runDiagnosis(){
-  const privacyAgree = $("privacyAgree")?.checked;
+  const privacyAgree = checked("privacyAgree");
 
   if (!privacyAgree) {
     alert("개인정보 수집·이용에 동의해야 무료 진단 신청이 가능합니다.");
+    return;
+  }
+
+  if(!checked("parentContactAgree")){
+    alert("학부모 전화번호 제공 동의 확인에 체크해야 무료 진단 신청이 가능합니다.");
     return;
   }
 
@@ -851,34 +1053,11 @@ function runDiagnosis(){
 
   if(high < 40){
     label = "상향권";
-    advice = "합격 가능성은 낮은 편입니다. 동일 전공의 전형/지역/모집단위 우회 전략을 함께 검토하십시오.";
+    advice = "합격 가능성은 낮은 편입니다. 동일 전공의 전형·지역·모집단위 우회 전략을 함께 검토하십시오.";
   } else if(low < 55){
     label = "적정~소신권";
     advice = "지원 가능성은 있으나 변동성이 있습니다. 6장 조합에서는 안정 카드와 함께 배치하는 것이 적절합니다.";
   }
-
-  const submission = {
-    time: new Date().toLocaleString("ko-KR"),
-    name: val("name"),
-    school: val("school"),
-    studentPhone: val("studentPhone"),
-    parentPhone: val("parentPhone"),
-    approvalCode: val("approvalCode"),
-    grade,
-    schoolType: val("schoolType"),
-    activity: val("activity"),
-    track,
-    career: val("career"),
-    univ,
-    major,
-    record: val("record"),
-    result: `합격 ${low}~${high}%, 불합격 ${failLow}~${failHigh}%`,
-    label
-  };
-
-  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
-  arr.push(submission);
-  localStorage.setItem("ssemSubmissions", JSON.stringify(arr));
 
   $("result").classList.remove("hidden");
   $("result").innerHTML = `
@@ -890,25 +1069,30 @@ function runDiagnosis(){
       <p>불합격 가능성: ${failLow}% ~ ${failHigh}%</p>
       <p>${advice}</p>
 
-      <div class="notice">
+      <div class="notice important">
+        본 결과는 상담용 예측 자료이며 합격을 보장하지 않습니다.
         최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결,
-        학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.
+        학교장추천 가능 여부, 수능최저 충족 가능성, 서류평가 및 면접 요소를 반드시 재확인하세요.
       </div>
     </div>
 
     <div class="resultBox" style="margin-top:16px; border:2px solid #1e5aa8; background:#f7fbff;">
-      <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+      <label class="checkLabel">
         <input
           type="checkbox"
           id="paidAnalysisRequest"
           onchange="submitPaidAnalysisRequest()"
-          style="width:auto; margin-top:5px;"
         >
         <span>
           <b>[심층 지원분석 희망(유료)]</b><br>
           <span class="small">
-            체크하면 입력한 학생 정보와 진단결과가 [신청 자료] 구글 시트에 저장되며,
+            체크하면 입력한 학생 정보와 진단결과가 신청 자료로 저장되며,
             SSEM 입시연구소에서 심층 지원분석 안내를 위해 연락드릴 수 있습니다.
+          </span>
+          <br>
+          <span class="tiny">
+            ※ 이 체크만으로 결제 또는 상담 계약이 체결되는 것은 아닙니다.
+            심층 지원분석의 비용, 범위, 일정, 환불 기준은 별도 안내 후 신청자의 동의를 받아 진행됩니다.
           </span>
         </span>
       </label>
@@ -918,10 +1102,12 @@ function runDiagnosis(){
   const sheetPayload = {
     action: "saveApplication",
     requestType: "무료진단",
+    time: new Date().toLocaleString("ko-KR"),
     name: val("name"),
     school: val("school"),
     studentPhone: val("studentPhone"),
     parentPhone: val("parentPhone"),
+    parentContactAgree: checked("parentContactAgree") ? "동의확인" : "미확인",
     approvalCode: val("approvalCode"),
     grade: val("grade"),
     schoolType: val("schoolType"),
@@ -935,13 +1121,12 @@ function runDiagnosis(){
     failRange: `${failLow}% ~ ${failHigh}%`,
     diagnosis: `${label} / ${advice}`,
     paidAnalysisRequest: false,
-    privacyAgree: privacyAgree
+    privacyAgree: privacyAgree ? "동의" : "미동의",
+    disclaimer: "본 진단은 상담용 예측 자료이며 합격을 보장하지 않음"
   };
 
   window.lastSsemPayload = sheetPayload;
   saveToGoogleSheet(sheetPayload);
-
-  if(isAdmin()) renderAdmin();
 
   setTimeout(() => {
     $("result").scrollIntoView({
@@ -951,161 +1136,42 @@ function runDiagnosis(){
   }, 100);
 }
 
-function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, m => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[m]));
-}
-
 function resetForm(){
   ["grade","career","univ","major","record"].forEach(id => {
     const el = $(id);
     if(el) el.value = "";
   });
 
-  $("result").classList.add("hidden");
-}
-
-function checkAdmin(){
-  const pw = val("adminPassword");
-  const msg = $("adminLoginMsg");
-
-  if(pw !== CONFIG.adminPassword){
-    msg.classList.remove("hidden");
-    msg.textContent = "관리자 비밀번호가 일치하지 않습니다.";
-    msg.style.borderColor = "#f2c2c2";
-    msg.style.background = "#fff2f2";
-    return;
-  }
-
-  sessionStorage.setItem("ssemAdminAuth","true");
-  openAdminPanel();
-}
-
-function openAdminPanel(){
-  $("adminLoginBox").classList.add("hidden");
-  $("adminSecurePanel").classList.remove("hidden");
-  renderAdmin();
-}
-
-function logoutAdmin(){
-  sessionStorage.removeItem("ssemAdminAuth");
-  $("adminSecurePanel").classList.add("hidden");
-  $("adminLoginBox").classList.remove("hidden");
-  $("adminPassword").value = "";
-  $("adminTable").innerHTML = "";
-}
-
-function isAdmin(){
-  return sessionStorage.getItem("ssemAdminAuth") === "true";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if(isAdmin()) openAdminPanel();
-});
-
-function renderAdmin(){
-  if(!isAdmin()){
-    alert("관리자 로그인 후 이용할 수 있습니다.");
-    return;
-  }
-
-  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
-
-  if(!arr.length){
-    $("adminTable").innerHTML = '<p class="small">아직 접수된 자료가 없습니다.</p>';
-    return;
-  }
-
-  const rows = arr.slice().reverse().map(x => `
-    <tr>
-      <td>${escapeHtml(x.time)}</td>
-      <td>
-        ${escapeHtml(x.name)}<br>
-        학생: ${escapeHtml(x.studentPhone)}<br>
-        학부모: ${escapeHtml(x.parentPhone)}<br>
-        승인코드: ${escapeHtml(x.approvalCode)}
-      </td>
-      <td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td>
-      <td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td>
-      <td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td>
-      <td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td>
-    </tr>
-  `).join("");
-
-  $("adminTable").innerHTML = `
-    <table>
-      <tr>
-        <th>접수시각</th>
-        <th>신청자</th>
-        <th>학교</th>
-        <th>성적/활동</th>
-        <th>희망지원</th>
-        <th>결과</th>
-      </tr>
-      ${rows}
-    </table>
-  `;
-}
-
-function downloadCSV(){
-  if(!isAdmin()){
-    alert("관리자 로그인 후 이용할 수 있습니다.");
-    return;
-  }
-
-  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
-
-  if(!arr.length){
-    alert("내려받을 접수자료가 없습니다.");
-    return;
-  }
-
-  const headers = Object.keys(arr[0]);
-  const csv = [headers.join(",")]
-    .concat(arr.map(o => headers.map(h => `"${String(o[h] ?? "").replace(/"/g,'""')}"`).join(",")))
-    .join("\n");
-
-  const blob = new Blob(["\ufeff" + csv], {
-    type:"text/csv;charset=utf-8"
-  });
-
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "ssem_2027_submissions.csv";
-  a.click();
-}
-
-function clearSubmissions(){
-  if(!isAdmin()){
-    alert("관리자 로그인 후 이용할 수 있습니다.");
-    return;
-  }
-
-  if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){
-    localStorage.removeItem("ssemSubmissions");
-    renderAdmin();
-  }
+  if($("privacyAgree")) $("privacyAgree").checked = false;
+  if($("result")) $("result").classList.add("hidden");
 }
 
 function submitPaidAnalysisRequest() {
-  const checked = $("paidAnalysisRequest")?.checked;
+  const checkedPaid = $("paidAnalysisRequest")?.checked;
 
-  if (!checked) return;
+  if (!checkedPaid) return;
 
   if (!window.lastSsemPayload) {
     alert("먼저 진단을 완료한 뒤 신청해 주세요.");
     return;
   }
 
+  const ok = confirm(
+    "심층 지원분석 희망 신청을 접수할까요?\n\n" +
+    "체크만으로 결제 또는 상담 계약이 체결되는 것은 아니며,\n" +
+    "비용, 범위, 일정, 환불 기준은 별도 안내 후 동의를 받아 진행됩니다."
+  );
+
+  if(!ok){
+    $("paidAnalysisRequest").checked = false;
+    return;
+  }
+
   const paidPayload = {
     ...window.lastSsemPayload,
     requestType: "심층 지원분석 희망(유료)",
-    paidAnalysisRequest: true
+    paidAnalysisRequest: true,
+    paidNotice: "체크만으로 결제 또는 상담 계약이 체결되지 않으며 별도 안내 후 진행"
   };
 
   saveToGoogleSheet(paidPayload);
