@@ -108,15 +108,20 @@
   <label>학부모 전화번호</label>
   <input id="parentPhone" placeholder="예: 010-1234-5678">
 </div>
-        <div><label>승인코드</label><input id="approvalCode" placeholder="운영자 제공 코드"></div>
-      </div>
-      <div class="btnRow">
-        <button class="btn" onclick="checkApproval()">승인 확인</button>
-        <button class="btn gray" onclick="document.getElementById('approvalCode').value='SSEM2027'">데모 승인코드 입력</button>
-      </div>
-      <div id="approvalMsg" class="notice hidden"></div>
-    </div>
-  </section>
+
+<div>
+  <label>승인코드</label>
+  <input id="approvalCode" placeholder="운영자 제공 코드">
+</div>
+</div>
+
+<div class="btnRow">
+  <button class="btn" onclick="checkApproval()">승인 확인</button>
+</div>
+
+<div id="approvalMsg" class="notice hidden"></div>
+</div>
+</section>
 
   <section id="diagnosis" class="section hidden">
     <div class="card">
@@ -142,9 +147,8 @@
 
     <div style="margin-top:12px; padding:14px; background:#f1f5f9; border:1px solid #dbe3ec; border-radius:12px; font-size:13px; color:#475569; line-height:1.7;">
     <strong>개인정보 수집·이용 안내</strong><br>
-    수집 항목: 이름, 출신고, 학생 전화번호, 학부모 전화번호, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과, 심층 지원분석 희망 여부<br>
-수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공, 승인 확인, 심층 지원분석 신청자 상담 안내<br> 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과<br>
-    수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공 및 상담 안내<br>
+    수집 항목: 이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 학생부 요약, 진단결과, 심층 지원분석 희망 여부<br>
+수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공, 승인 확인, 심층 지원분석 신청자 상담 안내<br>
     보유 기간: 수집일로부터 1년 또는 삭제 요청 시 즉시 삭제<br>
     제3자 제공: 없음<br>
     개인정보 관리 책임: SSEM 입시연구소 운영자
@@ -303,14 +307,6 @@ function checkApproval(){
   document.body.appendChild(script);
 }
 
-  showApproval("승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
-  $("diagnosis").classList.remove("hidden");
-
-  setTimeout(() => {
-    $("diagnosis").scrollIntoView({ behavior: "smooth", block: "start" });
-  }, 100);
-}
-
 function baselineByTarget(univ, major, track){
   const u = univ.replace(/\s/g,"");
   const m = major.replace(/\s/g,"");
@@ -420,12 +416,14 @@ function runDiagnosis(){
   }
 
   const submission = {
-    time: new Date().toLocaleString("ko-KR"),
-    name: val("name"),
-    school: val("school"),
-    studentPhone: val("studentPhone"),
-    parentPhone: val("parentPhone"),
-    grade,
+    const submission = {
+  time: new Date().toLocaleString("ko-KR"),
+  name: val("name"),
+  school: val("school"),
+  studentPhone: val("studentPhone"),
+  parentPhone: val("parentPhone"),
+  approvalCode: val("approvalCode"),
+  grade,
     schoolType: val("schoolType"),
     activity: val("activity"),
     track,
