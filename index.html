@@ -211,12 +211,23 @@
 
 <script>
 const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_IjEIUZrZ6-As44HPop-EgF3ow1A7annZJhBMCdekNEqXabbbpSUNiVLfuNZkNfGl/exec';
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_IjEIUZrZ6-As44HPop-EgF3ow1A7annZJhBMCdekNEqXabbbpSUNiVLfuNZkNfGl/exec";
+
+function $(id){ return document.getElementById(id); }
+
+function val(id){
+  const el = $(id);
+  return el ? (el.value || "").trim() : "";
+}
+
+function clamp(n,min,max){
+  return Math.max(min, Math.min(max, n));
+}
 
 function saveToGoogleSheet(payload) {
   if (!GOOGLE_SCRIPT_URL) {
     console.error("Google Script URL이 없습니다.");
-    return;
+    return Promise.resolve();
   }
 
   return fetch(GOOGLE_SCRIPT_URL, {
@@ -230,20 +241,13 @@ function saveToGoogleSheet(payload) {
     console.error("Google Sheet 저장 오류:", err);
   });
 }
-  return fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify(payload)
-  });
-}
-function $(id){ return document.getElementById(id); }
-function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-function val(id){ 
-  const el = $(id);
-  return el ? (el.value || "").trim() : "";
+
+function showApproval(msg, ok){
+  const box = $("approvalMsg");
+  box.classList.remove("hidden");
+  box.textContent = msg;
+  box.style.borderColor = ok ? "#bfe5d1" : "#f2c2c2";
+  box.style.background = ok ? "#f0fbf5" : "#fff2f2";
 }
 
 function checkApproval(){
@@ -263,30 +267,16 @@ function checkApproval(){
 
   showApproval("승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
   $("diagnosis").classList.remove("hidden");
-  location.hash = "diagnosis";
-}
-  const required = ["name","school","studentPhone","parentPhone","approvalCode"];
-  for(const id of required){
-  if(!val(id)){
-  showApproval("이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드를 모두 입력해 주세요.", false);
-  return;
-  }
-  if(val("approvalCode") !== CONFIG.approvalCode){
-    showApproval("승인코드가 일치하지 않습니다. SSEM 입시연구소에서 안내받은 코드를 확인해 주세요.", false); return;
-  }
-  showApproval("승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
-  $("diagnosis").classList.remove("hidden");
-  location.hash = "diagnosis";
-}
-function showApproval(msg, ok){
-  const box=$("approvalMsg"); box.classList.remove("hidden"); box.textContent=msg;
-  box.style.borderColor = ok ? "#bfe5d1" : "#f2c2c2";
-  box.style.background = ok ? "#f0fbf5" : "#fff2f2";
+
+  setTimeout(() => {
+    $("diagnosis").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
 }
 
 function baselineByTarget(univ, major, track){
-  const u=univ.replace(/\s/g,""); const m=major.replace(/\s/g,"");
-  let base=3.2, volatility=0.28, tier="일반 모집단위";
+  const u = univ.replace(/\s/g,"");
+  const m = major.replace(/\s/g,"");
+  let base = 3.2, volatility = 0.28, tier = "일반 모집단위";
 
   if(/서울대|연세대|고려대|서강대|성균관대|한양대/.test(u)){base=1.45; volatility=0.18; tier="최상위권 대학";}
   else if(/중앙대|경희대|외대|시립대|이화|건국대|동국대|홍익대/.test(u)){base=2.05; volatility=0.22; tier="서울 주요 대학";}
@@ -310,23 +300,33 @@ function baselineByTarget(univ, major, track){
 
 function activityScore(activity, record, career, major, track){
   let score = 0;
-  if(activity==="상") score += 9; else if(activity==="중") score += 3; else score -= 5;
-  const text = (record+" "+career+" "+major).toLowerCase();
-  const majorWords = major.split(/[,\s/·]+/).filter(w=>w.length>1);
+  if(activity === "상") score += 9;
+  else if(activity === "중") score += 3;
+  else score -= 5;
+
+  const text = (record + " " + career + " " + major).toLowerCase();
+  const majorWords = major.split(/[,\s/·]+/).filter(w => w.length > 1);
   let match = 0;
-  for(const w of majorWords){ if(text.includes(w.toLowerCase())) match++; }
-  if(match>0) score += Math.min(8, match*3);
-  if(record.length > 120) score += 5; else if(record.length < 20) score -= 4;
+
+  for(const w of majorWords){
+    if(text.includes(w.toLowerCase())) match++;
+  }
+
+  if(match > 0) score += Math.min(8, match * 3);
+  if(record.length > 120) score += 5;
+  else if(record.length < 20) score -= 4;
+
   if(track.includes("종합")) score *= 1.35;
   if(track.includes("교과")) score *= 0.55;
+
   return score;
 }
 
 function schoolTypeAdjust(type, track){
-  let a=0;
+  let a = 0;
   if(["특목고","영재학교/과학고"].includes(type) && track.includes("종합")) a += 7;
   if(["특목고","영재학교/과학고"].includes(type) && track.includes("교과")) a -= 5;
-  if(type==="특성화고") a -= 4;
+  if(type === "특성화고") a -= 4;
   return a;
 }
 
@@ -338,118 +338,159 @@ function runDiagnosis(){
     return;
   }
 
-  const grade=parseFloat(val("grade"));
-  if(!grade || grade < 1 || grade > 9){ alert("내신 평균 등급을 1.00~9.00 사이로 입력해 주세요."); return; }
-  if(!val("univ") || !val("major")){ alert("지원희망 대학과 학과를 입력해 주세요."); return; }
+  const grade = parseFloat(val("grade"));
+  if(!grade || grade < 1 || grade > 9){
+    alert("내신 평균 등급을 1.00~9.00 사이로 입력해 주세요.");
+    return;
+  }
 
-  const track=val("track"), univ=val("univ"), major=val("major");
-  const b=baselineByTarget(univ, major, track);
-  const diff = b.base - grade; // positive = user better
-  let prob = 50 + diff*22;
+  if(!val("univ") || !val("major")){
+    alert("지원희망 대학과 학과를 입력해 주세요.");
+    return;
+  }
+
+  const track = val("track");
+  const univ = val("univ");
+  const major = val("major");
+  const b = baselineByTarget(univ, major, track);
+  const diff = b.base - grade;
+
+  let prob = 50 + diff * 22;
   prob += activityScore(val("activity"), val("record"), val("career"), major, track);
   prob += schoolTypeAdjust(val("schoolType"), track);
+
   if(/의예|의대|치의|한의|약학|수의/.test(major)) prob -= 10;
-  if(/서울대|연세대|고려대/.test(univ) && grade>1.7) prob -= 10;
+  if(/서울대|연세대|고려대/.test(univ) && grade > 1.7) prob -= 10;
+
   prob = clamp(Math.round(prob), 5, 92);
 
-  const spread = Math.round(8 + b.volatility*18);
-  const low = clamp(prob-spread, 1, 98), high = clamp(prob+spread, 2, 99);
-  const failLow = clamp(100-high, 1, 99), failHigh = clamp(100-low, 1, 99);
-  let label="안정권", cls="ok", advice="안정 지원 가능성이 있으나, 수능최저·모집인원 변동·면접 변수는 별도 확인해야 합니다.";
-  if(high < 40){ label="상향권", cls="bad"; advice="합격 가능성은 낮은 편입니다. 동일 전공의 전형/지역/모집단위 우회 전략을 함께 검토하십시오."; }
-  else if(low < 55){ label="적정~소신권", cls="mid"; advice="지원 가능성은 있으나 변동성이 있습니다. 6장 조합에서는 안정 카드와 함께 배치하는 것이 적절합니다."; }
+  const spread = Math.round(8 + b.volatility * 18);
+  const low = clamp(prob - spread, 1, 98);
+  const high = clamp(prob + spread, 2, 99);
+  const failLow = clamp(100 - high, 1, 99);
+  const failHigh = clamp(100 - low, 1, 99);
+
+  let label = "안정권";
+  let advice = "안정 지원 가능성이 있으나, 수능최저·모집인원 변동·면접 변수는 별도 확인해야 합니다.";
+
+  if(high < 40){
+    label = "상향권";
+    advice = "합격 가능성은 낮은 편입니다. 동일 전공의 전형/지역/모집단위 우회 전략을 함께 검토하십시오.";
+  } else if(low < 55){
+    label = "적정~소신권";
+    advice = "지원 가능성은 있으나 변동성이 있습니다. 6장 조합에서는 안정 카드와 함께 배치하는 것이 적절합니다.";
+  }
 
   const submission = {
-   const submission = {
-  time: new Date().toLocaleString("ko-KR"),
-  name: val("name"),
-  school: val("school"),
-  studentPhone: val("studentPhone"),
-  parentPhone: val("parentPhone"),
-  grade,
-  schoolType: val("schoolType"),
-  activity: val("activity"),
-  track,
-  career: val("career"),
-  univ,
-  major,
-  record: val("record"),
-  result: `합격 ${low}~${high}%, 불합격 ${failLow}~${failHigh}%`,
-  label
-};
-  const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]"); arr.push(submission);
+    time: new Date().toLocaleString("ko-KR"),
+    name: val("name"),
+    school: val("school"),
+    studentPhone: val("studentPhone"),
+    parentPhone: val("parentPhone"),
+    grade,
+    schoolType: val("schoolType"),
+    activity: val("activity"),
+    track,
+    career: val("career"),
+    univ,
+    major,
+    record: val("record"),
+    result: `합격 ${low}~${high}%, 불합격 ${failLow}~${failHigh}%`,
+    label
+  };
+
+  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
+  arr.push(submission);
   localStorage.setItem("ssemSubmissions", JSON.stringify(arr));
 
   $("result").classList.remove("hidden");
   $("result").innerHTML = `
-  <h2>3. 진단 결과</h2>
+    <h2>3. 진단 결과</h2>
 
-  <div class="resultBox">
-    <h3>${label}</h3>
-    <p>합격 가능성: ${low}% ~ ${high}%</p>
-    <p>불합격 가능성: ${failLow}% ~ ${failHigh}%</p>
-    <p>${advice}</p>
+    <div class="resultBox">
+      <h3>${label}</h3>
+      <p>합격 가능성: ${low}% ~ ${high}%</p>
+      <p>불합격 가능성: ${failLow}% ~ ${failHigh}%</p>
+      <p>${advice}</p>
 
-    <div class="notice">
-      최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결,
-      학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.
+      <div class="notice">
+        최종 판단 전 대학별 입학처 최종 수시모집요강, 대학어디가 공개 입결,
+        학교장추천 가능 여부, 수능최저 충족 가능성을 반드시 재확인하세요.
+      </div>
     </div>
-  </div>
 
-  <div class="resultBox" style="margin-top:16px; border:2px solid #1e5aa8; background:#f7fbff;">
-    <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
-      <input 
-        type="checkbox" 
-        id="paidAnalysisRequest" 
-        onchange="submitPaidAnalysisRequest()"
-        style="width:auto; margin-top:5px;"
-      >
-      <span>
-        <b>[심층 지원분석 희망(유료)]</b><br>
-        <span class="small">
-          체크하면 입력한 학생 정보와 진단결과가 [신청 자료] 구글 시트에 저장되며,
-          SSEM 입시연구소에서 심층 지원분석 안내를 위해 연락드릴 수 있습니다.
+    <div class="resultBox" style="margin-top:16px; border:2px solid #1e5aa8; background:#f7fbff;">
+      <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+        <input 
+          type="checkbox" 
+          id="paidAnalysisRequest" 
+          onchange="submitPaidAnalysisRequest()"
+          style="width:auto; margin-top:5px;"
+        >
+        <span>
+          <b>[심층 지원분석 희망(유료)]</b><br>
+          <span class="small">
+            체크하면 입력한 학생 정보와 진단결과가 [신청 자료] 구글 시트에 저장되며,
+            SSEM 입시연구소에서 심층 지원분석 안내를 위해 연락드릴 수 있습니다.
+          </span>
         </span>
-      </span>
-    </label>
-  </div>
-`;
+      </label>
+    </div>
+  `;
 
   const sheetPayload = {
-   const sheetPayload = {
-  requestType: "무료진단",
-  name: val("name"),
-  school: val("school"),
-  studentPhone: val("studentPhone"),
-  parentPhone: val("parentPhone"),
-  grade: val("grade"),
-  schoolType: val("schoolType"),
-  activityLevel: val("activity"),
-  track: val("track"),
-  careerHope: val("career"),
-  university: val("univ"),
-  department: val("major"),
-  record: val("record"),
-  passRange: `${low}% ~ ${high}%`,
-  failRange: `${failLow}% ~ ${failHigh}%`,
-  diagnosis: `${label} / ${advice}`,
-  paidAnalysisRequest: false,
-  privacyAgree: privacyAgree
-};
+    requestType: "무료진단",
+    name: val("name"),
+    school: val("school"),
+    studentPhone: val("studentPhone"),
+    parentPhone: val("parentPhone"),
+    grade: val("grade"),
+    schoolType: val("schoolType"),
+    activityLevel: val("activity"),
+    track: val("track"),
+    careerHope: val("career"),
+    university: val("univ"),
+    department: val("major"),
+    record: val("record"),
+    passRange: `${low}% ~ ${high}%`,
+    failRange: `${failLow}% ~ ${failHigh}%`,
+    diagnosis: `${label} / ${advice}`,
+    paidAnalysisRequest: false,
+    privacyAgree: privacyAgree
+  };
 
-window.lastSsemPayload = sheetPayload;
-saveToGoogleSheet(sheetPayload);
+  window.lastSsemPayload = sheetPayload;
+  saveToGoogleSheet(sheetPayload);
 
   if(isAdmin()) renderAdmin();
-  location.hash = "result";
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
-function resetForm(){["grade","career","univ","major","record"].forEach(id=>$(id).value=""); $("result").classList.add("hidden");}
 
+  setTimeout(() => {
+    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+}
+
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[m]));
+}
+
+function resetForm(){
+  ["grade","career","univ","major","record"].forEach(id => {
+    const el = $(id);
+    if(el) el.value = "";
+  });
+  $("result").classList.add("hidden");
+}
 
 function checkAdmin(){
   const pw = val("adminPassword");
   const msg = $("adminLoginMsg");
+
   if(pw !== CONFIG.adminPassword){
     msg.classList.remove("hidden");
     msg.textContent = "관리자 비밀번호가 일치하지 않습니다.";
@@ -457,14 +498,17 @@ function checkAdmin(){
     msg.style.background = "#fff2f2";
     return;
   }
+
   sessionStorage.setItem("ssemAdminAuth","true");
   openAdminPanel();
 }
+
 function openAdminPanel(){
   $("adminLoginBox").classList.add("hidden");
   $("adminSecurePanel").classList.remove("hidden");
   renderAdmin();
 }
+
 function logoutAdmin(){
   sessionStorage.removeItem("ssemAdminAuth");
   $("adminSecurePanel").classList.add("hidden");
@@ -472,34 +516,95 @@ function logoutAdmin(){
   $("adminPassword").value = "";
   $("adminTable").innerHTML = "";
 }
+
 function isAdmin(){
   return sessionStorage.getItem("ssemAdminAuth") === "true";
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   if(isAdmin()) openAdminPanel();
 });
 
 function renderAdmin(){
-  if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; }
-  const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]");
-  if(!arr.length){ $("adminTable").innerHTML='<p class="small">아직 접수된 자료가 없습니다.</p>'; return; }
-  const rows=arr.slice().reverse().map(x=>`<tr><td>${escapeHtml(x.time)}</td><td>
-  ${escapeHtml(x.name)}<br>
-  학생: ${escapeHtml(x.studentPhone)}<br>
-  학부모: ${escapeHtml(x.parentPhone)}
-</td><td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td><td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td><td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td><td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td></tr>`).join("");
-  $("adminTable").innerHTML=`<table><tr><th>접수시각</th><th>신청자</th><th>학교</th><th>성적/활동</th><th>희망지원</th><th>결과</th></tr>${rows}</table>`;
+  if(!isAdmin()){
+    alert("관리자 로그인 후 이용할 수 있습니다.");
+    return;
+  }
+
+  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
+
+  if(!arr.length){
+    $("adminTable").innerHTML = '<p class="small">아직 접수된 자료가 없습니다.</p>';
+    return;
+  }
+
+  const rows = arr.slice().reverse().map(x => `
+    <tr>
+      <td>${escapeHtml(x.time)}</td>
+      <td>
+        ${escapeHtml(x.name)}<br>
+        학생: ${escapeHtml(x.studentPhone)}<br>
+        학부모: ${escapeHtml(x.parentPhone)}
+      </td>
+      <td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td>
+      <td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td>
+      <td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td>
+      <td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td>
+    </tr>
+  `).join("");
+
+  $("adminTable").innerHTML = `
+    <table>
+      <tr>
+        <th>접수시각</th>
+        <th>신청자</th>
+        <th>학교</th>
+        <th>성적/활동</th>
+        <th>희망지원</th>
+        <th>결과</th>
+      </tr>
+      ${rows}
+    </table>
+  `;
 }
+
 function downloadCSV(){
-  if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; }
-  const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]");
-  if(!arr.length){ alert("내려받을 접수자료가 없습니다."); return; }
-  const headers=Object.keys(arr[0]);
-  const csv=[headers.join(",")].concat(arr.map(o=>headers.map(h=>`"${String(o[h]??"").replace(/"/g,'""')}"`).join(","))).join("\n");
-  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ssem_2027_submissions.csv"; a.click();
+  if(!isAdmin()){
+    alert("관리자 로그인 후 이용할 수 있습니다.");
+    return;
+  }
+
+  const arr = JSON.parse(localStorage.getItem("ssemSubmissions") || "[]");
+
+  if(!arr.length){
+    alert("내려받을 접수자료가 없습니다.");
+    return;
+  }
+
+  const headers = Object.keys(arr[0]);
+  const csv = [headers.join(",")]
+    .concat(arr.map(o => headers.map(h => `"${String(o[h] ?? "").replace(/"/g,'""')}"`).join(",")))
+    .join("\n");
+
+  const blob = new Blob(["\ufeff" + csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ssem_2027_submissions.csv";
+  a.click();
 }
-function clearSubmissions(){ if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; } if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){localStorage.removeItem("ssemSubmissions"); renderAdmin();}}
+
+function clearSubmissions(){
+  if(!isAdmin()){
+    alert("관리자 로그인 후 이용할 수 있습니다.");
+    return;
+  }
+
+  if(confirm("이 브라우저에 저장된 접수자료를 삭제할까요?")){
+    localStorage.removeItem("ssemSubmissions");
+    renderAdmin();
+  }
+}
+
 function submitPaidAnalysisRequest() {
   const checked = $("paidAnalysisRequest")?.checked;
 
@@ -521,5 +626,3 @@ function submitPaidAnalysisRequest() {
   alert("심층 지원분석 희망 신청이 접수되었습니다. SSEM 입시연구소에서 안내 연락을 드릴 수 있습니다.");
 }
 </script>
-</body>
-</html>
