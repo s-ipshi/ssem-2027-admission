@@ -142,7 +142,8 @@
 
     <div style="margin-top:12px; padding:14px; background:#f1f5f9; border:1px solid #dbe3ec; border-radius:12px; font-size:13px; color:#475569; line-height:1.7;">
     <strong>개인정보 수집·이용 안내</strong><br>
-    수집 항목: 이름, 출신고, 전화번호, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과<br>
+    수집 항목: 이름, 출신고, 학생 전화번호, 학부모 전화번호, 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과, 심층 지원분석 희망 여부<br>
+수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공, 승인 확인, 심층 지원분석 신청자 상담 안내<br> 내신성적 평균, 고등학교 유형, 창체활동 수준, 진로희망, 지원희망 대학 및 학과, 진단결과<br>
     수집 목적: 2027학년도 수시 전형 지원 합불 무료 진단 제공 및 상담 안내<br>
     보유 기간: 수집일로부터 1년 또는 삭제 요청 시 즉시 삭제<br>
     제3자 제공: 없음<br>
@@ -213,6 +214,22 @@ const CONFIG = { approvalCode: "SSEM2027", adminPassword: "SSEMADMIN2027" };
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_IjEIUZrZ6-As44HPop-EgF3ow1A7annZJhBMCdekNEqXabbbpSUNiVLfuNZkNfGl/exec';
 
 function saveToGoogleSheet(payload) {
+  if (!GOOGLE_SCRIPT_URL) {
+    console.error("Google Script URL이 없습니다.");
+    return;
+  }
+
+  return fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  }).catch(err => {
+    console.error("Google Sheet 저장 오류:", err);
+  });
+}
   return fetch(GOOGLE_SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
@@ -224,9 +241,30 @@ function saveToGoogleSheet(payload) {
 }
 function $(id){ return document.getElementById(id); }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-function val(id){ return ($(id).value || "").trim(); }
+function val(id){ 
+  const el = $(id);
+  return el ? (el.value || "").trim() : "";
+}
 
 function checkApproval(){
+  const required = ["name","school","studentPhone","parentPhone","approvalCode"];
+
+  for(const id of required){
+    if(!val(id)){
+      showApproval("이름, 출신고, 학생 전화번호, 학부모 전화번호, 승인코드를 모두 입력해 주세요.", false);
+      return;
+    }
+  }
+
+  if(val("approvalCode") !== CONFIG.approvalCode){
+    showApproval("승인코드가 일치하지 않습니다. SSEM 입시연구소에서 안내받은 코드를 확인해 주세요.", false);
+    return;
+  }
+
+  showApproval("승인이 확인되었습니다. 아래 진단 입력 항목을 작성해 주세요.", true);
+  $("diagnosis").classList.remove("hidden");
+  location.hash = "diagnosis";
+}
   const required = ["name","school","studentPhone","parentPhone","approvalCode"];
   for(const id of required){
   if(!val(id)){
@@ -322,10 +360,23 @@ function runDiagnosis(){
   else if(low < 55){ label="적정~소신권", cls="mid"; advice="지원 가능성은 있으나 변동성이 있습니다. 6장 조합에서는 안정 카드와 함께 배치하는 것이 적절합니다."; }
 
   const submission = {
-    time:new Date().toLocaleString("ko-KR"), name:val("name"), school:val("school"), phone:val("phone"),
-    grade, schoolType:val("schoolType"), activity:val("activity"), track, career:val("career"),
-    univ, major, record:val("record"), result:`합격 ${low}~${high}%, 불합격 ${failLow}~${failHigh}%`, label
-  };
+   const submission = {
+  time: new Date().toLocaleString("ko-KR"),
+  name: val("name"),
+  school: val("school"),
+  studentPhone: val("studentPhone"),
+  parentPhone: val("parentPhone"),
+  grade,
+  schoolType: val("schoolType"),
+  activity: val("activity"),
+  track,
+  career: val("career"),
+  univ,
+  major,
+  record: val("record"),
+  result: `합격 ${low}~${high}%, 불합격 ${failLow}~${failHigh}%`,
+  label
+};
   const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]"); arr.push(submission);
   localStorage.setItem("ssemSubmissions", JSON.stringify(arr));
 
@@ -365,23 +416,29 @@ function runDiagnosis(){
 `;
 
   const sheetPayload = {
-    name: val("name"),
-    school: val("school"),
-    phone: val("phone"),
-    grade: val("grade"),
-    schoolType: val("schoolType"),
-    activityLevel: val("activity"),
-    careerHope: val("career"),
-    university: val("univ"),
-    department: val("major"),
-    passRange: `${low}% ~ ${high}%`,
-    failRange: `${failLow}% ~ ${failHigh}%`,
-    diagnosis: `${label} / ${advice}`,
-    privacyAgree: privacyAgree
-  };
+   const sheetPayload = {
+  requestType: "무료진단",
+  name: val("name"),
+  school: val("school"),
+  studentPhone: val("studentPhone"),
+  parentPhone: val("parentPhone"),
+  grade: val("grade"),
+  schoolType: val("schoolType"),
+  activityLevel: val("activity"),
+  track: val("track"),
+  careerHope: val("career"),
+  university: val("univ"),
+  department: val("major"),
+  record: val("record"),
+  passRange: `${low}% ~ ${high}%`,
+  failRange: `${failLow}% ~ ${failHigh}%`,
+  diagnosis: `${label} / ${advice}`,
+  paidAnalysisRequest: false,
+  privacyAgree: privacyAgree
+};
 
-  sawindow.lastSsemPayload = sheetPayload;
-  saveToGoogleSheet(sheetPayload);
+window.lastSsemPayload = sheetPayload;
+saveToGoogleSheet(sheetPayload);
 
   if(isAdmin()) renderAdmin();
   location.hash = "result";
@@ -426,7 +483,11 @@ function renderAdmin(){
   if(!isAdmin()){ alert("관리자 로그인 후 이용할 수 있습니다."); return; }
   const arr=JSON.parse(localStorage.getItem("ssemSubmissions")||"[]");
   if(!arr.length){ $("adminTable").innerHTML='<p class="small">아직 접수된 자료가 없습니다.</p>'; return; }
-  const rows=arr.slice().reverse().map(x=>`<tr><td>${escapeHtml(x.time)}</td><td>${escapeHtml(x.name)}<br>${escapeHtml(x.phone)}</td><td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td><td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td><td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td><td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td></tr>`).join("");
+  const rows=arr.slice().reverse().map(x=>`<tr><td>${escapeHtml(x.time)}</td><td>
+  ${escapeHtml(x.name)}<br>
+  학생: ${escapeHtml(x.studentPhone)}<br>
+  학부모: ${escapeHtml(x.parentPhone)}
+</td><td>${escapeHtml(x.school)}<br>${escapeHtml(x.schoolType)}</td><td>${escapeHtml(x.grade)} / ${escapeHtml(x.activity)}</td><td>${escapeHtml(x.univ)} ${escapeHtml(x.major)}<br>${escapeHtml(x.track)}</td><td>${escapeHtml(x.result)}<br>${escapeHtml(x.label)}</td></tr>`).join("");
   $("adminTable").innerHTML=`<table><tr><th>접수시각</th><th>신청자</th><th>학교</th><th>성적/활동</th><th>희망지원</th><th>결과</th></tr>${rows}</table>`;
 }
 function downloadCSV(){
